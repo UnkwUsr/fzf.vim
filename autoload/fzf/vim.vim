@@ -1698,8 +1698,15 @@ function! fzf#vim#maps(mode, ...)
   for line in split(cout, "\n")
     if line =~ "^\t"
       let src = "\t".substitute(matchstr(line, '/\zs[^/\\]*\ze$'), ' [^ ]* ', ':', '')
+      " let src = line
       call add(list, printf('%s %s', curr, s:green(src, 'Comment')))
       let curr = ''
+    elseif line =~ "^ \\{17}"
+      " let src = 'pizda'
+      " call add(list, printf('%s %s', curr, s:green(src, 'Comment')))
+      let curr .= line[16:]
+" printf('%s %s', curr, s:green(src, 'Comment')))
+      " let curr .= line[17:]
     else
       if !empty(curr)
         call add(list, curr)
@@ -1710,12 +1717,10 @@ function! fzf#vim#maps(mode, ...)
   if !empty(curr)
     call add(list, curr)
   endif
-  let aligned = s:align_pairs(list)
-  let sorted  = sort(aligned)
-  let colored = map(sorted, 's:highlight_keys(v:val)')
+  let sorted  = sort(list)
   let pcolor  = a:mode == 'x' ? 9 : a:mode == 'o' ? 10 : 12
   return s:fzf('maps', {
-  \ 'source':  colored,
+  \ 'source':  sorted,
   \ 'sink':    s:function('s:key_sink'),
   \ 'options': '--prompt "Maps ('.a:mode.')> " --ansi --no-hscroll --nth 1,.. --color prompt:'.pcolor}, a:000)
 endfunction
